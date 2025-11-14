@@ -3,91 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zego Voice Room</title>
+  <title>Voice Room</title>
 
-  <!-- Zego UIKit CDN -->
-  <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
+  <!-- Zego UIKit -->
+  <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt"></script>
 
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-color: #121212;
-      color: white;
-      font-family: Arial, sans-serif;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
+      background: #080808;
+      color: white;
+      font-family: Arial;
     }
-
-    #joinContainer {
-      text-align: center;
-      background: #1f1f1f;
+    #root {
+      width: 100%;
+      height: 100%;
+    }
+    .box {
+      background: #1a1a1a;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 10px #000;
+      text-align: center;
+      width: 300px;
     }
-
     input {
-      margin: 10px;
-      padding: 10px;
-      width: 80%;
-      border: none;
-      border-radius: 5px;
-      outline: none;
-      font-size: 16px;
-    }
-
-    button {
-      background-color: #007bff;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    #roomContainer {
       width: 100%;
-      height: 100vh;
-      display: none;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      margin-top: 12px;
+      background: #00c6ff;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      color: black;
+      font-size: 16px;
+      font-weight: bold;
     }
   </style>
 </head>
+
 <body>
-  <div id="joinContainer">
-    <h2>🎙️ Join Voice Room</h2>
-    <input id="roomId" type="text" placeholder="Enter Room ID" />
-    <input id="userName" type="text" placeholder="Enter Your Name" />
-    <button onclick="joinRoom()">Join Room</button>
+
+  <div class="box" id="joinBox">
+    <h2>Join Voice Room</h2>
+    <input id="roomId" placeholder="Enter Room ID" />
+    <button onclick="joinRoom()">Join Now</button>
   </div>
 
-  <div id="roomContainer"></div>
+  <div id="root" style="display:none"></div>
 
   <script>
     const appID = 436671143;
     const serverSecret = "7d2bd0f580082ef3137d43bc1fe0e0db";
 
     function joinRoom() {
-      const roomID = document.getElementById("roomId").value.trim();
-      const userName = document.getElementById("userName").value.trim();
+      const roomID = document.getElementById("roomId").value;
+      if (!roomID) return alert("Enter Room ID");
 
-      if (!roomID || !userName) {
-        alert("Please enter Room ID and Name");
-        return;
-      }
+      document.getElementById("joinBox").style.display = "none";
+      document.getElementById("root").style.display = "block";
 
-      document.getElementById("joinContainer").style.display = "none";
-      document.getElementById("roomContainer").style.display = "block";
-
-      const userID = "user_" + Math.floor(Math.random() * 10000);
+      const userID = "user" + Date.now();
+      const userName = "Guest_" + Math.floor(Math.random() * 1000);
 
       const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appID,
@@ -100,15 +87,27 @@
       const zp = ZegoUIKitPrebuilt.create(kitToken);
 
       zp.joinRoom({
-        container: document.getElementById("roomContainer"),
+        container: document.querySelector("#root"),
+        sharedLinks: [
+          {
+            name: "Room Link",
+            url: window.location.origin + "?roomID=" + roomID
+          }
+        ],
         scenario: {
-          mode: ZegoUIKitPrebuilt.VoiceCall,
+          mode: ZegoUIKitPrebuilt.GroupCall,
         },
-        showScreenSharingButton: false,
-        showTurnOffCameraButton: false,
-        showLeaveRoomConfirmDialog: true,
+        turnOnCameraWhenJoining: false,
+        turnOnMicrophoneWhenJoining: true
       });
     }
+
+    // Auto-Join (If roomID in URL)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("roomID")) {
+      document.getElementById("roomId").value = params.get("roomID");
+    }
   </script>
+
 </body>
 </html>
