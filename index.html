@@ -17,7 +17,7 @@
       height: 100vh;
       background: #080808;
       color: white;
-      font-family: Arial, sans-serif;
+      font-family: Arial;
     }
     #root {
       width: 100%;
@@ -54,56 +54,54 @@
 
 <body>
 
-  <div class="box" id="joinBox">
-    <h2>Join Voice Room</h2>
-    <input id="roomId" placeholder="Enter Room ID" />
-    <button onclick="joinRoom()">Join Now</button>
-  </div>
+<div class="box" id="joinBox">
+  <h2>Join Voice Room</h2>
+  <input id="roomId" placeholder="Enter Room ID" />
+  <button onclick="joinRoom()">Join Now</button>
+</div>
 
-  <div id="root"></div>
+<div id="root"></div>
 
-  <script>
-    const appID = 436671143;
-    const serverSecret = "7d2bd0f580082ef3137d43bc1fe0e0db";
+<script>
+  const appID = 436671143;
+  const serverSecret = "7d2bd0f580082ef3137d43bc1fe0e0db";
 
-    function joinRoom() {
-      const roomID = document.getElementById("roomId").value.trim();
-      if (!roomID) return alert("Enter Room ID");
+  function joinRoom() {
+    const roomID = document.getElementById("roomId").value.trim();
+    if (!roomID) return alert("Enter Room ID");
 
-      document.getElementById("joinBox").style.display = "none";
-      document.getElementById("root").style.display = "block";
+    document.getElementById("joinBox").style.display = "none";
+    document.getElementById("root").style.display = "block";
 
-      const userID = "user" + Date.now();
-      const userName = "Guest_" + Math.floor(Math.random() * 10000);
+    const userID = "user" + Date.now();
+    const userName = "Guest_" + Math.floor(Math.random() * 10000);
 
-      const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-        appID,
-        serverSecret,
-        roomID,
-        userID,
-        userName
-      );
+    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+      appID,
+      serverSecret,
+      roomID,
+      userID,
+      userName
+    );
 
-      const zp = ZegoUIKitPrebuilt.create(kitToken);
+    const zp = ZegoUIKitPrebuilt.create(kitToken);
 
-      zp.joinRoom({
-        container: document.getElementById("root"),
-        scenario: {
-          mode: ZegoUIKitPrebuilt.GroupCall,
-        },
-        turnOnCameraWhenJoining: false,
-        turnOnMicrophoneWhenJoining: true,
-        showTurnOffCameraButton: false,
-        showScreenSharingButton: false,
-      });
-    }
+    zp.joinRoom({
+      container: document.getElementById("root"),
+      scenario: {
+        mode: ZegoUIKitPrebuilt.GroupCall,
+      },
+      turnOnCameraWhenJoining: false,
+      turnOnMicrophoneWhenJoining: true,
+    });
+  }
 
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("roomID")) {
-      document.getElementById("roomId").value = params.get("roomID");
-      joinRoom();
-    }
-  </script>
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("roomID")) {
+    document.getElementById("roomId").value = params.get("roomID");
+    joinRoom();
+  }
+</script>
 
 </body>
 </html>
