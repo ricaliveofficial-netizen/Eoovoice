@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Voice Room</title>
 
-  <!-- Zego UIKit -->
-  <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt"></script>
+  <script src="https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js"></script>
 
   <style>
     body {
@@ -18,11 +17,12 @@
       height: 100vh;
       background: #080808;
       color: white;
-      font-family: Arial;
+      font-family: Arial, sans-serif;
     }
     #root {
       width: 100%;
       height: 100%;
+      display: none;
     }
     .box {
       background: #1a1a1a;
@@ -39,15 +39,15 @@
       border: none;
     }
     button {
-      margin-top: 12px;
-      background: #00c6ff;
-      padding: 10px;
       width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background: #00aaff;
       border: none;
-      border-radius: 5px;
-      color: black;
+      color: white;
       font-size: 16px;
-      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -60,21 +60,21 @@
     <button onclick="joinRoom()">Join Now</button>
   </div>
 
-  <div id="root" style="display:none"></div>
+  <div id="root"></div>
 
   <script>
     const appID = 436671143;
     const serverSecret = "7d2bd0f580082ef3137d43bc1fe0e0db";
 
     function joinRoom() {
-      const roomID = document.getElementById("roomId").value;
+      const roomID = document.getElementById("roomId").value.trim();
       if (!roomID) return alert("Enter Room ID");
 
       document.getElementById("joinBox").style.display = "none";
       document.getElementById("root").style.display = "block";
 
       const userID = "user" + Date.now();
-      const userName = "Guest_" + Math.floor(Math.random() * 1000);
+      const userName = "Guest_" + Math.floor(Math.random() * 10000);
 
       const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appID,
@@ -87,25 +87,21 @@
       const zp = ZegoUIKitPrebuilt.create(kitToken);
 
       zp.joinRoom({
-        container: document.querySelector("#root"),
-        sharedLinks: [
-          {
-            name: "Room Link",
-            url: window.location.origin + "?roomID=" + roomID
-          }
-        ],
+        container: document.getElementById("root"),
         scenario: {
           mode: ZegoUIKitPrebuilt.GroupCall,
         },
         turnOnCameraWhenJoining: false,
-        turnOnMicrophoneWhenJoining: true
+        turnOnMicrophoneWhenJoining: true,
+        showTurnOffCameraButton: false,
+        showScreenSharingButton: false,
       });
     }
 
-    // Auto-Join (If roomID in URL)
     const params = new URLSearchParams(window.location.search);
     if (params.get("roomID")) {
       document.getElementById("roomId").value = params.get("roomID");
+      joinRoom();
     }
   </script>
 
